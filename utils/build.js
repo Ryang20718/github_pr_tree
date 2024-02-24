@@ -10,11 +10,12 @@ const bumpMinorVersion = (version) => {
 }
 
 const getChromeVersion = async () => {
-  console.log('📞  Getting version from Chrome Webstore...')
-  const value = await chromeWebStoreItemProperty(chromeStoreId)
+  // console.log('📞  Getting version from Chrome Webstore...')
+  // const value = await chromeWebStoreItemProperty(chromeStoreId)
 
-  console.log('🔥  Chrome Webstore version:', value.version)
-  return value.version
+  // console.log('🔥  Chrome Webstore version:', value.version)
+  // return value.version
+  return "1.0.0"
 }
 
 const getNewVersion = async () => {

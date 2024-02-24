@@ -5,7 +5,7 @@
   "scripts": {
     "precommit": "git diff --name-only --cached --relative | grep '\\.jsx\\?$' | xargs node_modules/.bin/standard -v | ./node_modules/.bin/snazzy",
     "build": "yarn build-chrome",
-    "build-chrome": "cross-env TARGET=chrome node utils/build.js",
+    "build-chrome": "cross-env NODE_OPTIONS=--openssl-legacy-provider TARGET=chrome node utils/build.js",
     "build-firefox": "cross-env TARGET=firefox node utils/build.js",
     "start": "yarn start-chrome",
     "start-chrome": "cross-env NODE_ENV=development TARGET=chrome node utils/start.js",
