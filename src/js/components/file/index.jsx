@@ -37,14 +37,15 @@ class File extends React.Component {
   }
 
   render () {
-    const { name, href, hasComments, isDeleted, isVisible, diffStats, filter, isViewed } = this.props
+    const { name, href, hasComments, isDeleted, isVisible, diffStats, codeOwner, filter, isViewed } = this.props
     const { options = {} } = this.state
     const className = getClassWithColor(name)
     const topClassName = [
       'github-pr-file',
       isVisible && 'github-pr-file-highlight',
       isDeleted && 'github-pr-file-deleted',
-      isViewed && 'github-pr-file-viewed'
+      isViewed && 'github-pr-file-viewed',
+      codeOwner && 'codeowner'
     ].filter(Boolean).join(' ')
 
     const index = filter ? (name.toLowerCase() || '').indexOf(filter.toLowerCase()) : -1

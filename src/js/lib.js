@@ -91,11 +91,12 @@ const getCurrentFileLocation = (title) => {
 }
 
 export const folderConcat = (node) => {
+  const codeOwnMap = createCodeOwnerMap()
   const isFileOrEmpty = (node.list === undefined || node.list.length === 0 || (node.href !== null && node.href !== undefined))
   if (isFileOrEmpty) {
+    node.codeOwner = codeOwnMap.has(node.fullPath)
     return node
   }
-
   const hasSingleChild = (node.list.length === 1)
   if (hasSingleChild) {
     const collapsed = folderConcat(node.list[0])
@@ -113,54 +114,78 @@ export const folderConcat = (node) => {
   return node
 }
 
+
+export const createCodeOwnerMap = () => {
+  const codeOwnerMap = new Map(); // map of file path to true/false (to indicate this is owned by you)
+  const codeOwnerDivs = document.querySelectorAll('.file-header.d-flex.flex-md-row.flex-column.flex-md-items-center.file-header--expandable.js-file-header.js-skip-tagsearch.sticky-file-header.js-position-sticky.js-position-sticky-stacked')
+  codeOwnerDivs.forEach(element => {
+    const filePath = element.getAttribute('data-path');
+    const spanElements = element.querySelectorAll('span.tooltipped.tooltipped-se');
+
+    spanElements.forEach(span => {
+      const codeOwner = span.getAttribute('aria-label');
+      const ownedByYou = codeOwner.includes("Owned by you")
+      codeOwnerMap.set("/" + filePath, ownedByYou);
+    });
+  });
+  return codeOwnerMap
+}
+
 export const createFileTree = (filter = EMPTY_FILTER) => {
-  const fileInfo = [...document.querySelectorAll('.file-info a.Link--primary')]
+  const fileInfo = [...document.querySelectorAll('.file-info a.Link--primary')];
   const files = fileInfo.map(({ title, href }) => {
-    title = getCurrentFileLocation(title)
-    return { title, href, parts: title.split('/') }
-  })
-  const count = fileInfo.filter(({ href }) => href && href.includes('#diff')).length
+    title = getCurrentFileLocation(title);
+    return { title, href, parts: title.split('/') };
+  });
+  const count = fileInfo.filter(({ href }) => href && href.includes('#diff')).length;
   const tree = {
     nodeLabel: '/',
     list: [],
-    diffElements: []
-  }
+    diffElements: [],
+    fullPath: ''
+  };
 
   files.forEach(({ parts, href }) => {
-    let location = tree
-    if (filterItem(parts[parts.length - 1], filter)) {
+    let location = tree;
+    if (filterItem(parts[parts.length -  1], filter)) {
       parts.forEach((part, index) => {
-        let node = location.list.find(node => node.nodeLabel === part)
+        let node = location.list.find(node => node.nodeLabel === part);
         if (!node) {
-          const hrefSplit = href.split('#')
-          const fileId = hrefSplit[hrefSplit.length - 1]
-          const diffElement = getDiffElement(fileId)
+          const hrefSplit = href.split('#');
+          const fileId = hrefSplit[hrefSplit.length -  1];
+          const diffElement = getDiffElement(fileId);
           if (diffElement) {
-            const hasComments = (countCommentsForFileId(fileId) > 0)
-            const isDeleted = isDeletedForFileId(fileId)
-            tree.diffElements.push(diffElement)
+            const hasComments = (countCommentsForFileId(fileId) >  0);
+            const isDeleted = isDeletedForFileId(fileId);
+            tree.diffElements.push(diffElement);
+            // Construct the full path by concatenating the current part with the parent's full path
+            const fullPath = `${location.fullPath}/${part}`;
             node = {
               nodeLabel: part,
               list: [],
-              href: (index === parts.length - 1) ? href : null,
+              href: (index === parts.length -  1) ? href : null,
               hasComments,
               isDeleted,
               diffElement,
-              diffStats: getDiffStatsForDiffElement(diffElement)
-            }
-            location.list.push(node)
+              diffStats: getDiffStatsForDiffElement(diffElement),
+              codeOwner: false,
+              fullPath // Include the fullPath in each node
+            };
+
+            location.list.push(node);
           }
         }
-        location.list = location.list.sort(sorter)
-        location = node
-      })
+        location.list = location.list.sort(sorter);
+        location = node;
+      });
     }
-  })
+  });
   return {
     tree: folderConcat(tree),
     count
-  }
-}
+  };
+};
+
 
 export const isElementVisible = (el) => {
   if (!el) {
@@ -233,3 +258,5 @@ export const isFileViewed = diffElement => {
   const checkbox = diffElement.querySelector('.js-reviewed-checkbox')
   return checkbox && checkbox.checked
 }
+
+

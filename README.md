@@ -7,6 +7,7 @@ Chrome and Firefox browser extension to show a file tree on GitHub's Pull Reques
 - GitHub Enterprise support
 - Dark mode
 - Other goodies: track viewed files, resizable tree, expand to full width and more
+- Find which files you're a codeowner of in a pull request
 
 ![GitHub Pull Request](assets/screenshot.png "GitHub Pull Request")
 

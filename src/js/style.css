@@ -290,3 +290,7 @@
     color: #2cbe4e;
     margin-left: 5px;
 }
+
+.codeowner::after {
+    content: "👀 codeowner"; 
+}
